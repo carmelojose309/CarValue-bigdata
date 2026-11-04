@@ -1,14 +1,14 @@
 # Entrega · CarValue AI
 
-**Grupo:** ...
+**Grupo:** Pablo Díaz, Eduardo Caicedo, Lucas Bravo.
 
-**Repositorio GitHub (privado, con acceso al profesor):** https://github.com/...
+**Repositorio GitHub (privado, con acceso al profesor):** https://github.com/carmelojose309/CarValue-bigdata
 
 | Integrante | Parte implementada | Rama | 2 commits propios | URL del PR | ¿Quién revisó? |
 |---|---|---|---|---|---|
-| ... | ... | ... | Sí/No | ... | ... |
-| ... | ... | ... | Sí/No | ... | ... |
-| ... (si hay 3) | ... | ... | Sí/No | ... | ... |
+| Eduardo Caicedo | Apartado A | Feature/infra-datos | Sí | https://github.com/carmelojose309/CarValue-bigdata/pull/2 | Pablo Díaz |
+| Pablo Díaz | Apartado B | Feature/Api-ml | Sí | https://github.com/carmelojose309/CarValue-bigdata/pull/4 | Lucas Bravo |
+| Lucas Bravo | Apartado C | Feature/Vision-web | Sí | https://github.com/carmelojose309/CarValue-bigdata/pull/5 | Eduardo Caicedo |
 
 ## Pruebas de funcionamiento
 
@@ -36,13 +36,7 @@
 
 ## Incidencias que no pudimos resolver (si las hay)
 
-...
 
-## BONUS (solo si se ha hecho)
-
-- [ ] `/estadisticas` muestra gráfica(s) basadas en consultas a PostgreSQL `anuncios`.
-- [ ] `/estadisticas/grafico.png` responde `image/png`.
-- [ ] PR `feature/dashboard` revisado: URL ___
 
 ## Decisiones de implementación
 
