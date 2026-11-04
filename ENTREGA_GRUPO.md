@@ -12,17 +12,17 @@
 
 ## Pruebas de funcionamiento
 
-- [ ] Docker Compose: 3 servicios activos.
+- [x] Docker Compose: 3 servicios activos.
 - [ ] `SELECT COUNT(*) FROM anuncios` devuelve 50000.
-- [ ] `GET /health` OK.
-- [ ] Formulario POST sin JavaScript; fotografía recibida en Flask.
-- [ ] Modo `MOCK` integra modelo ML + SQLAlchemy y guarda tasación.
-- [ ] `/historial` muestra tasación.
+- [x] `GET /health` OK.
+- [x] Formulario POST sin JavaScript; fotografía recibida en Flask.
+- [x] Modo `MOCK` integra modelo ML + SQLAlchemy y guarda tasación.
+- [x] `/historial` muestra tasación.
 - [ ] Modo real Cohere (`VISION_MOCK=0`): probado / no probado por falta de clave o límite de uso (explicar).
-- [ ] `docker compose exec app pytest -q`: ___ tests superados.
+- [x] `docker compose exec app pytest -q`: 6 tests superados.
 - [ ] `.env` no está versionado.
-- [ ] Prompt propio escrito en `app/vision.py` (sin usar uno prefabricado).
-- [ ] Formulario HTML y página de resultado programados por el equipo.
+- [x] Prompt propio escrito en `app/vision.py` (sin usar uno prefabricado).
+- [x] Formulario HTML y página de resultado programados por el equipo.
 
 ## Reflexión breve (4 preguntas)
 
