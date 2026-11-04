@@ -3,18 +3,32 @@ import base64
 import json
 import os
 import re
+import cohere
 from .config import ESTADOS
 
 MODELO_VISION = "command-a-vision-07-2025"
-# TODO C1-A (autoría propia): diseñad y escribid el prompt del modelo visual.
-# El texto NO se proporciona. Revisad GUIA_ALUMNADO.md, etapa 5.
-# Debe describir tarea, reglas, 4 estados, unknown y formato de respuesta.
-PROMPT = ""  # RELLENAR. No vale copiar el prompt de otro equipo.
 
+PROMPT = """Actúa como un tasador de vehículos especializado únicamente en el aspecto exterior. 
+Analiza la fotografía proporcionada y determina el estado exterior del vehículo.
+
+REGLAS ESTRICTAS:
+1. Evalúa SOLO el aspecto exterior visible. No deduzcas el estado del motor, historial de accidentes, kilometraje real, ni funcionamiento mecánico.
+2. Debes clasificar el estado utilizando ÚNICAMENTE uno de estos cuatro valores exactos:
+   - "like new": Como nuevo, sin defectos apreciables.
+   - "excellent": Excelente, con desgaste mínimo.
+   - "good": Bueno, con marcas pequeñas de uso normal.
+   - "fair": Aceptable, con daños o desgaste clearly visibles.
+3. Si la imagen no muestra claramente un coche o faltan evidencias visuales para evaluarlo, el estado debe ser "unknown".
+4. Devuelve el resultado ESTRICTAMENTE en formato JSON plano, sin bloques de código Markdown ni texto introductorio.
+
+El JSON debe tener exactamente esta estructura:
+{
+  "condition": "<una de las 4 etiquetas permitidas o unknown>",
+  "reason": "<breve justificación en español basada solo en los detalles visuales>"
+}"""
 
 class VisionError(Exception):
     """Error de proveedor o de respuesta no interpretable."""
-
 
 def parsear_respuesta(texto: str) -> tuple[str, str]:
     """Helper ya implementado: valida el JSON que responde la IA."""
@@ -33,17 +47,39 @@ def parsear_respuesta(texto: str) -> tuple[str, str]:
         raise VisionError(f"Cohere devolvió una categoría inesperada: {estado!r}")
     return estado, razon or "Sin justificación visible."
 
-
 def clasificar_estado(contenido: bytes, mimetype: str) -> tuple[str, str, str]:
-    """TODO C1: devuelve (condition, reason, fuente)."""
+    """Devuelve (condition, reason, fuente)."""
     if os.getenv("VISION_MOCK", "0") == "1":
         return "good", "Modo demostración: estado fijo, sin analizar la fotografía.", "MOCK"
+    
     token = os.getenv("COHERE_API_KEY", "").strip()
     if not token:
         raise VisionError("Falta COHERE_API_KEY en el archivo .env")
+    
     if not PROMPT.strip():
         raise VisionError("Falta redactar el prompt visual: tarea C1-A.")
-    # TODO C1-B: convierte contenido en data URL base64 (mimetype dinamico).
-    # TODO C1-B: cliente = cohere.ClientV2(api_key=token); cliente.chat(...).
-    # TODO C1-B: recoge texto; parsear_respuesta(texto); devuelve estado, razon, "COHERE".
-    raise NotImplementedError("Completa la llamada real a Cohere Vision")
+        
+    try:
+        foto_b64 = base64.b64encode(contenido).decode('utf-8')
+        image_url = f"data:{mimetype};base64,{foto_b64}"
+        
+        cliente = cohere.ClientV2(api_key=token)
+        response = cliente.chat(
+            model=MODELO_VISION,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": PROMPT},
+                        {"type": "image_url", "image_url": {"url": image_url}}
+                    ]
+                }
+            ]
+        )
+        
+        texto = response.message.content[0].text
+        estado, razon = parsear_respuesta(texto)
+        return estado, razon, "COHERE"
+        
+    except Exception as e:
+        raise VisionError(f"Error al comunicar con Cohere o procesar la imagen: {str(e)}")
