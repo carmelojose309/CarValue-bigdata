@@ -31,13 +31,20 @@ def crear_tablas():
     Base.metadata.create_all(engine)
 
 
+
 def guardar_tasacion(registro: dict) -> int:
-    """TODO A5: persistir una tasación y devolver su id."""
-    # TODO A5: Session(engine), add(), commit(), refresh() y devuelve id
-    raise NotImplementedError("Completa guardar_tasacion")
+    with Session(engine) as session:
+        tasacion = Tasacion(**registro)
+        session.add(tasacion)
+        session.commit()
+        session.refresh(tasacion)
+        return tasacion.id
+
+
 
 
 def obtener_ultimas_tasaciones(limite: int = 10):
-    """TODO A6: SELECT de últimas tasaciones (descendente)."""
-    # TODO A6: select(Tasacion).order_by(...).limit(limite)
-    raise NotImplementedError("Completa obtener_ultimas_tasaciones")
+    with Session(engine) as session:
+        consulta = select(Tasacion).order_by(Tasacion.id.desc()).limit(limite)
+        return session.scalars(consulta).all()
+
