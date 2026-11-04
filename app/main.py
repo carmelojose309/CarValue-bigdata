@@ -23,10 +23,18 @@ def tasar():
     try:
         datos = validar_datos(request.form)
         foto, mimetype = validar_foto(request.files.get("foto"))
-        # TODO B2: unir vision -> modelo -> base de datos; ver CONTRATO_COMPONENTES.md
-        # TODO B2: llama a clasificar_estado; comprueba que NO sea unknown.
-        # TODO B2: llama a predecir_precio y construye registro para guardar_tasacion.
-        # TODO B2: devuelve resultado.html con datos, estado, razon, precio, fuente e identificador.
+        estado, razon, fuente = clasificar_estado(foto, mimetype)
+        if estado == "unknown":
+            raise ValueError(
+                "No se pudo evaluar el estado del coche con esta foto. "
+                "Sube una imagen clara del exterior del vehículo.")
+        precio = predecir_precio(datos, estado)
+        registro = {**datos, "condition": estado, "justificacion": razon,
+                    "price_prediction": precio, "vision_source": fuente}
+        identificador = guardar_tasacion(registro)
+        return render_template("resultado.html", datos=datos, estado=estado,
+                               razon=razon, precio=precio, fuente=fuente,
+                               identificador=identificador)
         raise NotImplementedError("Completa la ruta POST /tasar")
     except (ValueError, VisionError, NotImplementedError) as exc:
         return render_template("index.html", opciones=OPCIONES, error=str(exc)), 400
